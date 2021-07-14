@@ -8,7 +8,7 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-@EnableWebSecurity
+@EnableWebSecurity //configure entry points
 public class WebSecurity extends WebSecurityConfigurerAdapter {
     private final UserService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
@@ -22,8 +22,10 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
     protected void configure(HttpSecurity http) throws Exception {
         http.csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST,SecurityConstants.SIGN_UP_URL)
-                .permitAll()//alle Post requests akzeptieren
-                .anyRequest().authenticated(); // alle anderen Requests ablehnen
+                .permitAll()//alle Post requests mit signUpURL akzeptieren alle anderen Requests ablehnen
+                .anyRequest().authenticated().and().addFilter(new AuthenticationFilter(authenticationManager()));
+// authenticationManager() comes from  WebsecurityConfigurerAdapter and returns AuthentificationManager
+
     }
 
     @Override
