@@ -8,14 +8,14 @@ import org.springframework.security.config.annotation.web.configuration.EnableWe
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
-@EnableWebSecurity //configure entry points
+@EnableWebSecurity //configure entry points, this is a web security configuration
 public class WebSecurity extends WebSecurityConfigurerAdapter {
     private final UserService userDetailsService;
     private final BCryptPasswordEncoder bCryptPasswordEncoder;
 
     public WebSecurity(UserService userDetailsService, BCryptPasswordEncoder bCryptPasswordEncoder) {
-        this.userDetailsService = userDetailsService;
-        this.bCryptPasswordEncoder = bCryptPasswordEncoder;
+        this.userDetailsService = userDetailsService;  //injected via @EnableWebSecurity
+        this.bCryptPasswordEncoder = bCryptPasswordEncoder;//injected via @EnableWebSecurity
     }
 
     @Override
@@ -23,13 +23,16 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         http.csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST,SecurityConstants.SIGN_UP_URL)
                 .permitAll()//alle Post requests mit signUpURL akzeptieren alle anderen Requests ablehnen
-                .anyRequest().authenticated().and().addFilter(new AuthenticationFilter(authenticationManager()));
+                .anyRequest().authenticated().and().addFilter(new AuthenticationFilter(authenticationManager())); //use authenticationFilter Implementation
 // authenticationManager() comes from  WebsecurityConfigurerAdapter and returns AuthentificationManager
+        //has a request authority to do so?
 
     }
 
     @Override
     protected void configure(AuthenticationManagerBuilder auth) throws Exception {
-        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder);
+        //                        User.class
+        auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder); // needs password encoder
+
     }
 }

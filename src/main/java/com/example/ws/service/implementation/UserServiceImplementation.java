@@ -49,11 +49,11 @@ public class UserServiceImplementation implements UserService {
         return returnValue;
     }
 
+    //Implementierung UserDetailsService
     @Override
     public UserDetails loadUserByUsername(String email) throws UsernameNotFoundException {
         UserEntity userEntity = userRepository.findByEmail(email);
-
-        if (userEntity == null) throw new UsernameNotFoundException("email" + " not found");
+        if (userEntity == null) throw new UsernameNotFoundException(email);
 
         return new User(userEntity.getEmail(),userEntity.getEncryptedPassword(),new ArrayList<>());
     }

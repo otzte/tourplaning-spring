@@ -27,7 +27,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
 
     public AuthenticationFilter(AuthenticationManager authenticationManager) {
         this.authenticationManager = authenticationManager;
-
     }
 
     @Override
@@ -36,12 +35,11 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         try {
             UserLoginRequestModel creds = new ObjectMapper()
                     .readValue(request.getInputStream(),UserLoginRequestModel.class); //convert request information to java object
-
-            return authenticationManager.authenticate(
+            return authenticationManager.authenticate( //takes findByEmail-Method(UserRepository) to find out if data in creds match UserEntity
                     new UsernamePasswordAuthenticationToken(
                     creds.getEmail(),
                     creds.getPassword(),
-                    new ArrayList<>())
+                    new ArrayList<>()) // collection of authorities
             );
         }catch (IOException e){
             throw new RuntimeException(e);
@@ -50,7 +48,10 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
     }
 
     @Override
-    protected void successfulAuthentication(HttpServletRequest request, HttpServletResponse response, FilterChain chain, Authentication authResult) throws IOException, ServletException {
+    protected void successfulAuthentication(HttpServletRequest request,
+                                            HttpServletResponse response,
+                                            FilterChain chain,
+                                            Authentication authResult) throws IOException, ServletException {
         String username = ((User)authResult.getPrincipal()).getUsername();
 
         //Json Webtoken is used in AuthorizationFilter
@@ -59,10 +60,12 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
         String token = Jwts.builder()
                 .setSubject(username)
                 .setExpiration(new Date(System.currentTimeMillis() + SecurityConstants.EXPIRATION_TIME))
-                .signWith(SignatureAlgorithm.ES512, SecurityConstants.TOKEN_SECRET)
+                .signWith(SignatureAlgorithm.HS512, SecurityConstants.TOKEN_SECRET)
                 .compact();
 
         response.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
 
     }
+
+
 }
