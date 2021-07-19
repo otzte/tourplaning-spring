@@ -23,10 +23,9 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         http.csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST,SecurityConstants.SIGN_UP_URL)
                 .permitAll()//alle Post requests mit signUpURL akzeptieren alle anderen Requests ablehnen
-                .anyRequest().authenticated().and().addFilter(new AuthenticationFilter(authenticationManager())); //use authenticationFilter Implementation
+                .anyRequest().authenticated().and().addFilter(new AuthenticationFilter(authenticationManager()));//use authenticationFilter Implementation
 // authenticationManager() comes from  WebsecurityConfigurerAdapter and returns AuthentificationManager
         //has a request authority to do so?
-
     }
 
     @Override

@@ -1,6 +1,9 @@
 package com.example.security;
 
+import com.example.SpringApplicationContext;
+import com.example.shared.dto.UserDto;
 import com.example.ui.model.request.UserLoginRequestModel;
+import com.example.ws.service.UserService;
 import com.fasterxml.jackson.databind.ObjectMapper;
 import io.jsonwebtoken.Jwts;
 import io.jsonwebtoken.SignatureAlgorithm;
@@ -53,7 +56,6 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                                             FilterChain chain,
                                             Authentication authResult) throws IOException, ServletException {
         String username = ((User)authResult.getPrincipal()).getUsername();
-
         //Json Webtoken is used in AuthorizationFilter
         //when created, it is included in the header
         //request will only be authorized if header has the right Webtoken
@@ -63,8 +65,12 @@ public class AuthenticationFilter extends UsernamePasswordAuthenticationFilter {
                 .signWith(SignatureAlgorithm.HS512, SecurityConstants.TOKEN_SECRET)
                 .compact();
 
-        response.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
 
+        UserService userService =(UserService)SpringApplicationContext.getBean("userServiceImplementation");
+        UserDto userDto = userService.getUser(username);
+        response.addHeader(SecurityConstants.HEADER_STRING, SecurityConstants.TOKEN_PREFIX + token);
+        //JWT is added to header as soon as user is authorized via login
+        response.addHeader("UserID", userDto.getUserId());
     }
 
 

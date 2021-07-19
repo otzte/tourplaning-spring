@@ -16,7 +16,7 @@ import org.springframework.web.bind.annotation.*;
 public class UserController {
 
     @Autowired
-    UserService userService; //property
+    UserService userService; //looks for bean of type UserSevice and autowires it
 
     @GetMapping
     public String getUser(){
