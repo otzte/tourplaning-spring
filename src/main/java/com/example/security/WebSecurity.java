@@ -6,6 +6,7 @@ import org.springframework.security.config.annotation.authentication.builders.Au
 import org.springframework.security.config.annotation.web.builders.HttpSecurity;
 import org.springframework.security.config.annotation.web.configuration.EnableWebSecurity;
 import org.springframework.security.config.annotation.web.configuration.WebSecurityConfigurerAdapter;
+import org.springframework.security.config.http.SessionCreationPolicy;
 import org.springframework.security.crypto.bcrypt.BCryptPasswordEncoder;
 
 @EnableWebSecurity //configure entry points, this is a web security configuration
@@ -23,8 +24,13 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         http.csrf().disable().authorizeRequests()
                 .antMatchers(HttpMethod.POST,SecurityConstants.SIGN_UP_URL)
                 .permitAll()//alle Post requests mit signUpURL akzeptieren alle anderen Requests ablehnen
-                .anyRequest().authenticated().and().addFilter(new AuthenticationFilter(authenticationManager()));//use authenticationFilter Implementation
-// authenticationManager() comes from  WebsecurityConfigurerAdapter and returns AuthentificationManager
+                .anyRequest().authenticated().and()
+                .addFilter(getAuthenticationFilter())//use authenticationFilter Implementation
+                .addFilter(new AuthorizationFilter(authenticationManager()))//Authorizationfilter
+                .sessionManagement()
+                .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
+
+    // authenticationManager() comes from  WebsecurityConfigurerAdapter and returns AuthentificationManager
         //has a request authority to do so?
     }
 
@@ -33,5 +39,11 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
         //                        User.class
         auth.userDetailsService(userDetailsService).passwordEncoder(bCryptPasswordEncoder); // needs password encoder
 
+    }
+
+    public AuthenticationFilter getAuthenticationFilter() throws Exception{
+        final AuthenticationFilter filter = new AuthenticationFilter(authenticationManager());
+        filter.setFilterProcessesUrl("/users/login");
+        return filter;
     }
 }
