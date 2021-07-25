@@ -1,7 +1,7 @@
 package com.example.ws.service.implementation;
 
-import com.example.io.repository.UserRepository;
 import com.example.io.entity.UserEntity;
+import com.example.io.repository.UserRepository;
 import com.example.shared.Utils;
 import com.example.shared.dto.UserDto;
 import com.example.ws.service.UserService;
@@ -69,4 +69,15 @@ public class UserServiceImplementation implements UserService {
         return returnValue;
     }
 
+    @Override
+    public UserDto getUserById(String id) {
+        UserDto returnValue = new UserDto();
+        UserEntity userEntity = userRepository.findByUserId(id);
+
+        if (userEntity == null) {throw new UsernameNotFoundException(id);}
+
+        BeanUtils.copyProperties(userEntity,returnValue);
+
+        return returnValue;
+    }
 }

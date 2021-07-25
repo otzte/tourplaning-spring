@@ -1,11 +1,14 @@
 package com.example.ui.controller;
 
+import com.example.exceptions.UserServiceException;
 import com.example.shared.dto.UserDto;
 import com.example.ui.model.request.UserDetailsRequestModel;
+import com.example.ui.model.response.ErrorMessages;
 import com.example.ui.model.response.UserRest;
 import com.example.ws.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
+import org.springframework.http.MediaType;
 import org.springframework.web.bind.annotation.*;
 
 //controller responsible for all operations that have to do with users
@@ -18,19 +21,31 @@ public class UserController {
     @Autowired
     UserService userService; //looks for bean of type UserSevice and autowires it
 
-    @GetMapping
-    public String getUser(){
-        return "get user was called";
+    @GetMapping(path="/{id}", produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}) //send back Json or xml-type by default, order: first xml then Json
+    public UserRest getUser(@PathVariable String id){ //@PathVariable injects Path in id
+        //you only get here with successful Authentication
+
+        UserRest returnValue = new UserRest();
+        //populate UserRest with information
+
+        UserDto userDto = userService.getUserById(id);
+        BeanUtils.copyProperties(userDto,returnValue);
+
+        return returnValue;
     }
 
 
 
 
-    @PostMapping  // mit requestBody Annotation wird UserDetailsRequestModel mit JSON info injected
-    public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails){
+    @PostMapping(
+            consumes = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE},
+            produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE})
+    public UserRest createUser(@RequestBody UserDetailsRequestModel userDetails)throws Exception{ // mit requestBody Annotation wird UserDetailsRequestModel durch JSON info injected
 
         //return of T UserRest
         UserRest returnValue = new UserRest();
+
+        if (userDetails.getFirstName().isEmpty()) throw new UserServiceException(ErrorMessages.MISSING_REQUIRED_FIELD.getErrorMessage());
 
 
         //populate userDTO with information that i have recieved from

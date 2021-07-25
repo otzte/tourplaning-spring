@@ -11,4 +11,5 @@ public interface UserRepository extends CrudRepository<UserEntity,Long> {
     //By  muss mit dabei sein
     //Email
     UserEntity findByEmail(String email);
+    UserEntity findByUserId(String id);//composes sql query
 }
