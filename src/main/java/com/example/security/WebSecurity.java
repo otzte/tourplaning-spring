@@ -26,7 +26,7 @@ public class WebSecurity extends WebSecurityConfigurerAdapter {
                 .permitAll()//alle Post requests mit signUpURL akzeptieren alle anderen Requests ablehnen
                 .anyRequest().authenticated().and()
                 .addFilter(getAuthenticationFilter())//use authenticationFilter Implementation
-                .addFilter(new AuthorizationFilter(authenticationManager()))//Authorizationfilter
+                .addFilter(new AuthorizationFilter(authenticationManager()))//Authorizationfilter(uses JWT in header)
                 .sessionManagement()
                 .sessionCreationPolicy(SessionCreationPolicy.STATELESS);
 

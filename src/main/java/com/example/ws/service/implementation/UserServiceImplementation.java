@@ -1,9 +1,11 @@
 package com.example.ws.service.implementation;
 
+import com.example.exceptions.UserServiceException;
 import com.example.io.entity.UserEntity;
 import com.example.io.repository.UserRepository;
 import com.example.shared.Utils;
 import com.example.shared.dto.UserDto;
+import com.example.ui.model.response.ErrorMessages;
 import com.example.ws.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -78,6 +80,23 @@ public class UserServiceImplementation implements UserService {
 
         BeanUtils.copyProperties(userEntity,returnValue);
 
+        return returnValue;
+    }
+
+    @Override
+    public UserDto updateUser(String id, UserDto user) {
+        UserDto returnValue = new UserDto();
+        UserEntity userEntity = userRepository.findByUserId(id);
+        if (userEntity == null) {throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());}
+
+
+        //can be implemented with more logic (if user.getFirstname is not null ....)
+        userEntity.setFirstName(user.getFirstName());
+        userEntity.setLastName(user.getLastName());
+
+        UserEntity updatedUserDetails = userRepository.save(userEntity);
+
+        BeanUtils.copyProperties(updatedUserDetails,returnValue);
         return returnValue;
     }
 }
