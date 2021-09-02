@@ -83,6 +83,7 @@ public class UserServiceImplementation implements UserService {
         return returnValue;
     }
 
+
     @Override
     public UserDto updateUser(String id, UserDto user) {
         UserDto returnValue = new UserDto();
@@ -99,4 +100,16 @@ public class UserServiceImplementation implements UserService {
         BeanUtils.copyProperties(updatedUserDetails,returnValue);
         return returnValue;
     }
+
+
+
+    @Override
+    public void deleteUser(String userId) {
+        UserEntity userEntity = userRepository.findByUserId(userId);
+
+        if (userEntity == null) {throw new UserServiceException(ErrorMessages.NO_RECORD_FOUND.getErrorMessage());}
+        userRepository.delete(userEntity);
+
+    }
+
 }

@@ -3,8 +3,7 @@ package com.example.ui.controller;
 import com.example.exceptions.UserServiceException;
 import com.example.shared.dto.UserDto;
 import com.example.ui.model.request.UserDetailsRequestModel;
-import com.example.ui.model.response.ErrorMessages;
-import com.example.ui.model.response.UserRest;
+import com.example.ui.model.response.*;
 import com.example.ws.service.UserService;
 import org.springframework.beans.BeanUtils;
 import org.springframework.beans.factory.annotation.Autowired;
@@ -84,9 +83,15 @@ public class UserController {
 
     }
 
-    @DeleteMapping //binds this method to DeleteHTTP-Request an die bestimmte URL
-    public  String deleteUser(){
-        return "delete user was called";
+    @DeleteMapping( //binds this method to DeleteHTTP-Request an die bestimmte URL
+                path = "/{id}",
+                produces = {MediaType.APPLICATION_XML_VALUE, MediaType.APPLICATION_JSON_VALUE}
+                )
+    public  OperationStatusModel deleteUser(@PathVariable String id){
+        OperationStatusModel returnValue = new OperationStatusModel();
+        returnValue.setOperationName(RequestOperationName.DELETE.name());
+        returnValue.setOperationResult(RequestOperationStatus.SUCCESS.name());
+        return returnValue;
     }
 
 
